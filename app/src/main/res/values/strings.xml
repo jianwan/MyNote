@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Material Note</string>
+    <string name="app_name">MyNote</string>
     <string name="clean">"Clean all data"</string>
     <string name="about">About</string>
+    <string name="share">Share</string>
     <string name="delete">Delete</string>
     <string name="are_you_sure">Are you sure to delete？</string>
     <string name="close">Close</string>

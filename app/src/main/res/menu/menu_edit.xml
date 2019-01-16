@@ -3,13 +3,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
     <item
-        android:id="@+id/action_about"
+        android:id="@+id/action_share_weixin"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:title="@string/about"/>
-    <!--<item-->
-        <!--android:id="@+id/action_picture"-->
-        <!--app:showAsAction="always"-->
-        <!--android:title="@string/add_picture"-->
-        <!--android:icon="@drawable/ic_action_camera"/>-->
+        android:title="分享到微信好友"/>
+
+    <item
+        android:id="@+id/action_share_weixinmoment"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="分享到微信朋友圈"/>
+
+    <item
+        android:id="@+id/action_share_weibo"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="分享到微博"/>
+
 </menu>

@@ -4,13 +4,12 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -27,7 +26,7 @@ import com.xp.note.model.Note;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FloatingActionButton addBtn;
     private DBManager dm;
@@ -53,7 +52,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         addBtn = (FloatingActionButton) findViewById(R.id.add);
         emptyListTextView = (TextView) findViewById(R.id.empty);
         addBtn.setOnClickListener(this);
-        adapter = new MyAdapter(this, noteDataList);
+        //反向展现数据
+        List<Note> noteDataList2 = new ArrayList<>();
+        for (int i=noteDataList.size()-1;i>=0;i--){
+            noteDataList2.add(noteDataList.get(i));
+        }
+        adapter = new MyAdapter(this, noteDataList2);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new NoteClickListener());
         listView.setOnItemLongClickListener(new NoteLongClickListener());
@@ -84,7 +88,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         SystemBarTintManager tintManager = new SystemBarTintManager(this);
         // 激活状态栏设置
         tintManager.setStatusBarTintEnabled(true);
-        tintManager.setTintColor(Color.parseColor("#ff6cb506"));
+        tintManager.setTintColor(Color.parseColor("#00574B"));
     }
 
     //button单击事件
@@ -153,11 +157,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             case R.id.action_about:
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title(R.string.about)
-                        .customView(R.layout.dialog_webview, false)
-                        .positiveText(android.R.string.ok)
+                        .content("这是一个课程设计")
+                        .positiveText("确定")
                         .build();
-                WebView webView = (WebView) dialog.getCustomView().findViewById(R.id.webview);
-                webView.loadUrl("file:///android_asset/webview.html");
+
                 dialog.show();
                 break;
             case R.id.action_clean:
