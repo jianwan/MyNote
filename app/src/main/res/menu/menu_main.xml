@@ -9,6 +9,12 @@
         android:title="清除所有数据"/>
 
     <item
+        android:id="@+id/action_sync"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:icon="@drawable/sync"/>
+
+    <item
         android:id="@+id/action_about"
         android:orderInCategory="100"
         app:showAsAction="never"

@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -26,6 +28,13 @@ import com.xp.note.model.Note;
 import java.util.ArrayList;
 import java.util.List;
 
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
+
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     private FloatingActionButton addBtn;
@@ -33,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<Note> noteDataList = new ArrayList<>();
     private MyAdapter adapter;
     private ListView listView;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private TextView emptyListTextView;
     long waitTime = 2000;
     long touchTime = 0;
@@ -42,18 +52,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
+        //第一：默认初始化
+        Bmob.initialize(this, "bdc479c9f78d163df6442083ce8578e8");
+
+
     }
 
     //初始化
     private void init() {
         dm = new DBManager(this);
         dm.readFromDB(noteDataList);
-        listView = (ListView) findViewById(R.id.list);
-        addBtn = (FloatingActionButton) findViewById(R.id.add);
-        emptyListTextView = (TextView) findViewById(R.id.empty);
+        swipeRefreshLayout = findViewById(R.id.swiperefresh);
+
+
+
+        listView = findViewById(R.id.list);
+        addBtn = findViewById(R.id.add);
+        emptyListTextView = findViewById(R.id.empty);
         addBtn.setOnClickListener(this);
         //反向展现数据
-        List<Note> noteDataList2 = new ArrayList<>();
+        final List<Note> noteDataList2 = new ArrayList<>();
         for (int i=noteDataList.size()-1;i>=0;i--){
             noteDataList2.add(noteDataList.get(i));
         }
@@ -63,6 +81,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         listView.setOnItemLongClickListener(new NoteLongClickListener());
         setStatusBarColor();
         updateView();
+
+
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                BmobQuery<Note> query = new BmobQuery<>();
+                query.addWhereGreaterThanOrEqualTo("id",0);
+                query.findObjects(new FindListener<Note>() {
+                    @Override
+                    public void done(List<Note> list, BmobException e) {
+                        if (e==null){
+
+                            //ToDO bug
+//                            noteDataList2.clear();
+//                            noteDataList2.addAll(list);
+//
+                            swipeRefreshLayout.setRefreshing(false);
+//                            adapter = new MyAdapter(getApplicationContext(), noteDataList2);
+//                            listView.setAdapter(adapter);
+//                            adapter.notifyDataSetChanged();
+
+                            Toast.makeText(getApplicationContext(),"获取数据成功",Toast.LENGTH_SHORT).show();
+                        }else {
+                            swipeRefreshLayout.setRefreshing(false);
+                            Toast.makeText(getApplicationContext(),"获取数据失败"+e,Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+            }
+        });
+
+
+
+
+
     }
 
     //空数据更新
@@ -178,6 +231,109 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }).show();
 
+                break;
+
+            case R.id.action_sync:
+
+                //同步逻辑，先删除该用户的所有笔记，再将本地的笔记上传至服务器
+                //TODO 笔记为空时有bug
+                BmobQuery<Note> queryObjectId = new BmobQuery<>();
+                queryObjectId.addWhereGreaterThan("id",-1);
+                queryObjectId.findObjects(new FindListener<Note>() {
+                    @Override
+                    public void done(List<Note> list, BmobException e) {
+                        if (e == null){
+                            Note note1 = new Note();
+                            //依次删除表中数据
+                            for (int i = 0; i < list.size();i++){
+                                note1.setObjectId(list.get(i).getObjectId());
+                                note1.delete(new UpdateListener() {
+                                    @Override
+                                    public void done(BmobException e) {
+                                        if (e == null){
+                                            Toast.makeText(getApplicationContext(),"表删除成功",Toast.LENGTH_SHORT).show();
+
+                                        }else {
+
+                                            Toast.makeText(getApplicationContext(),e+"",Toast.LENGTH_SHORT).show();
+                                        }
+                                    }
+                                });
+                            }
+
+                            //删除成功则添加新数据
+                            for (int i = 0; i<noteDataList.size();i++){
+                                Note note = new Note();
+                                note.setId(noteDataList.get(i).getId());
+                                note.setTitle(noteDataList.get(i).getTitle());
+                                note.setContent(noteDataList.get(i).getContent());
+                                note.save(new SaveListener<String>() {
+                                    @Override
+                                    public void done(String s, BmobException e) {
+                                        if(e==null){
+                                            Toast.makeText(getApplicationContext(),"同步数据成功",Toast.LENGTH_SHORT).show();
+                                        }else{
+                                            Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+                                        }
+                                    }
+                                });
+                            }
+
+                        }else {
+
+                        }
+                    }
+                });
+
+
+
+                //同步数据到bmob
+//                for (int i = 0;i < noteDataList.size();i++){
+//                    final Note note = new Note();
+//                    note.setId(noteDataList.get(i).getId());
+//                    note.setTitle(noteDataList.get(i).getTitle());
+//                    note.setContent(noteDataList.get(i).getContent());
+//
+//                    BmobQuery<Note> query = new BmobQuery<>();
+//                    query.addWhereEqualTo("id",noteDataList.get(i).getId());
+//
+//
+//
+//
+//                    query.findObjects(new FindListener<Note>() {
+//                        @Override
+//                        public void done(List<Note> list, BmobException e) {
+//                            if (e == null){
+//                                //查询到则更新数据
+//                                note.update(list.get(0).getObjectId(), new UpdateListener() {
+//                                    @Override
+//                                    public void done(BmobException e) {
+//                                        if (e == null){
+//                                           // Toast.makeText(getApplicationContext(),"同步数据成功1",Toast.LENGTH_SHORT).show();
+//                                        }else {
+//
+//                                        }
+//                                    }
+//                                });
+//
+//                            }else {
+//                                //查询失败则新建一条数据
+//                                note.save(new SaveListener<String>() {
+//                                    @Override
+//                                    public void done(String s, BmobException e) {
+//                                        if(e==null){
+//                                            Toast.makeText(getApplicationContext(),"同步数据成功",Toast.LENGTH_SHORT).show();
+//                                        }else{
+//                                            Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
+//                                        }
+//                                    }
+//                                });
+//
+//                            }
+//                        }
+//                    });
+//
+//                }
                 break;
             default:
                 break;

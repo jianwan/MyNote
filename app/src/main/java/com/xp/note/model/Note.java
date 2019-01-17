@@ -1,9 +1,11 @@
 package com.xp.note.model;
 
+import cn.bmob.v3.BmobObject;
+
 /**
  * Created by XP on 2015/2/15.
  */
-public class Note {
+public class Note extends BmobObject {
     private int id;
     private String title;
     private String content;
@@ -40,4 +42,5 @@ public class Note {
     public void setTime(String time) {
         this.time = time;
     }
+
 }

@@ -17,6 +17,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    //兼容Android6.0系统所需
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
@@ -32,7 +35,19 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:commons:0.9.1.0'
     implementation 'com.getbase:floatingactionbutton:1.7.0'
     implementation 'com.android.support:cardview-v7:26.1.0'
-        implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+    implementation 'com.readystatesoftware.systembartint:systembartint:1.0.3'
+
+    //bmob
+    implementation 'cn.bmob.android:bmob-sdk:3.6.9'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.2"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+    implementation 'com.squareup.okio:okio:2.1.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.0'
+
+    //如果你想应用能够兼容Android6.0，请添加此依赖(org.apache.http.legacy.jar)
+    implementation 'cn.bmob.android:http-legacy:1.0'
+    implementation 'com.android.support:support-v4:23.2.1'
 
 }
 
