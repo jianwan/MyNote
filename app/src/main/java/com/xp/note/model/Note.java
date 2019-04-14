@@ -10,6 +10,7 @@ public class Note extends BmobObject {
     private String title;
     private String content;
     private String time;
+    private String priority;
 
     public int getId() {
         return id;
@@ -41,6 +42,14 @@ public class Note extends BmobObject {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
     }
 
 }

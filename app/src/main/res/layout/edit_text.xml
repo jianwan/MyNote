@@ -4,7 +4,105 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    android:orientation="vertical">
+    android:orientation="horizontal">
+
+
+    <LinearLayout
+        android:id="@+id/linear_remind"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textview_remindtime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight=".6"
+            android:padding="3dp"
+            android:text="提醒时间"
+            android:gravity="center"
+            android:textColor="#ff000000"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/editview_remindtime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:gravity="start"
+            android:paddingBottom="8dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:hint="@string/settingtime"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linear_priority"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_below="@id/linear_remind">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.6"
+            android:text="优 先 级:"
+            android:paddingLeft="10dp"
+            android:gravity="center"
+            android:textColor="#ff000000"
+            android:textStyle="bold" />
+
+        <RadioGroup
+            android:id="@+id/radiogroup_priority"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:orientation="horizontal"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp">
+
+            <RadioButton
+                android:id="@+id/radiobutton_high"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="高"/>
+
+            <RadioButton
+                android:id="@+id/radiobutton_medium"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="中"/>
+
+
+            <RadioButton
+                android:id="@+id/radiobutton_low"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:text="低"
+                android:checked="true"/>
+        </RadioGroup>
+
+    </LinearLayout>
+
+    <View
+        android:id="@+id/view_fengexian"
+        android:layout_width="fill_parent"
+        android:layout_height="1px"
+        android:background="@android:color/darker_gray"
+        android:layout_below="@+id/linear_priority"/>
 
     <EditText
         android:id="@+id/note_title"
@@ -12,28 +110,24 @@
         android:layout_height="wrap_content"
         android:hint="@string/title"
         android:maxLength="50"
-        android:singleLine="true">
-
+        android:singleLine="true"
+        android:layout_below="@+id/view_fengexian">
         <requestFocus />
     </EditText>
 
     <EditText
         android:id="@+id/note_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+        android:layout_height="280dp"
         android:layout_below="@+id/note_title"
         android:gravity="start"
         android:hint="@string/content"
-        android:inputType="textMultiLine" />
+        android:inputType="textMultiLine"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"/>
 
-    <ImageView
-        android:id="@+id/note_image"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/save" />
+
 
 
     <com.getbase.floatingactionbutton.FloatingActionButton

@@ -65,6 +65,8 @@ public class MyAdapter extends BaseAdapter {
                     = (TextView) convertView.findViewById(R.id.note_content);
             viewHolder.tvTime
                     = (TextView) convertView.findViewById(R.id.note_time);
+            viewHolder.tvPriority
+                    = (TextView) convertView.findViewById(R.id.note_priority);
             convertView.setTag(viewHolder);
 
         } else {
@@ -73,7 +75,8 @@ public class MyAdapter extends BaseAdapter {
         viewHolder.tvId.setText(notes.get(position).getId() + "");
         viewHolder.tvTitle.setText(notes.get(position).getTitle());
         viewHolder.tvContent.setText(notes.get(position).getContent());
-        viewHolder.tvTime.setText(notes.get(position).getTime());
+        viewHolder.tvTime.setText("编辑于"+notes.get(position).getTime());
+        viewHolder.tvPriority.setText("优先级："+notes.get(position).getPriority());
         return convertView;
     }
 
@@ -83,5 +86,7 @@ public class MyAdapter extends BaseAdapter {
         public TextView tvTitle;
         public TextView tvContent;
         public TextView tvTime;
+        public TextView tvPriority;
     }
+
 }

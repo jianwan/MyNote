@@ -65,12 +65,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
 
 
-
         listView = findViewById(R.id.list);
         addBtn = findViewById(R.id.add);
         emptyListTextView = findViewById(R.id.empty);
         addBtn.setOnClickListener(this);
-        //反向展现数据
+        //反向展现数据 新建的note在最上面
         final List<Note> noteDataList2 = new ArrayList<>();
         for (int i=noteDataList.size()-1;i>=0;i--){
             noteDataList2.add(noteDataList.get(i));
@@ -83,6 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         updateView();
 
 
+        //同步数据到本地
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -112,10 +112,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
-
-
-
     }
 
     //空数据更新
@@ -144,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         tintManager.setTintColor(Color.parseColor("#00574B"));
     }
 
-    //button单击事件
+    //点击新建新的记录事项
     @Override
     public void onClick(View view) {
         Intent i = new Intent(this, EditNoteActivity.class);
@@ -236,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_sync:
 
                 //同步逻辑，先删除该用户的所有笔记，再将本地的笔记上传至服务器
-                //TODO 笔记为空时有bug
+
                 BmobQuery<Note> queryObjectId = new BmobQuery<>();
                 queryObjectId.addWhereGreaterThan("id",-1);
                 queryObjectId.findObjects(new FindListener<Note>() {
@@ -267,6 +263,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 note.setId(noteDataList.get(i).getId());
                                 note.setTitle(noteDataList.get(i).getTitle());
                                 note.setContent(noteDataList.get(i).getContent());
+                                note.setTime(noteDataList.get(i).getTime());
+                                note.setPriority(noteDataList.get(i).getPriority());
                                 note.save(new SaveListener<String>() {
                                     @Override
                                     public void done(String s, BmobException e) {

@@ -9,9 +9,7 @@ import com.xp.note.model.Note;
 
 import java.util.List;
 
-/**
- * Created by XP on 2015/2/15.
- */
+
 public class DBManager {
     private Context context;
     private NoteDBOpenHelper databaseOpenHelper;
@@ -36,12 +34,13 @@ public class DBManager {
     }
 
     // 添加到数据库
-    public void addToDB(String title, String content, String time) {
+    public void addToDB(String title, String content, String time, String  priority) {
         //  组装数据
         ContentValues cv = new ContentValues();
         cv.put(NoteDBOpenHelper.TITLE, title);
         cv.put(NoteDBOpenHelper.CONTENT, content);
         cv.put(NoteDBOpenHelper.TIME, time);
+        cv.put(NoteDBOpenHelper.PRIORITY, priority);
         dbWriter.insert(NoteDBOpenHelper.TABLE_NAME, null, cv);
     }
 
@@ -55,6 +54,7 @@ public class DBManager {
                 note.setTitle(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.TITLE)));
                 note.setContent(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.CONTENT)));
                 note.setTime(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.TIME)));
+                note.setPriority(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.PRIORITY)));
                 noteList.add(note);
             }
         } catch (Exception e) {
@@ -64,12 +64,13 @@ public class DBManager {
     }
 
     //  更新数据
-    public void updateNote(int noteID, String title, String content, String time) {
+    public void updateNote(int noteID, String title, String content, String time,String priority) {
         ContentValues cv = new ContentValues();
         cv.put(NoteDBOpenHelper.ID, noteID);
         cv.put(NoteDBOpenHelper.TITLE, title);
         cv.put(NoteDBOpenHelper.CONTENT, content);
         cv.put(NoteDBOpenHelper.TIME, time);
+        cv.put(NoteDBOpenHelper.PRIORITY, priority);
         dbWriter.update(NoteDBOpenHelper.TABLE_NAME, cv, "_id = ?", new String[]{noteID + ""});
     }
 
@@ -84,6 +85,7 @@ public class DBManager {
         cursor.moveToFirst();
         Note note = new Note();
         note.setId(cursor.getInt(cursor.getColumnIndex(NoteDBOpenHelper.ID)));
+        note.setPriority(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.PRIORITY)));
         note.setTitle(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.TITLE)));
         note.setContent(cursor.getString(cursor.getColumnIndex(NoteDBOpenHelper.CONTENT)));
         return note;
