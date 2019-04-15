@@ -19,6 +19,7 @@ public class NoteDBOpenHelper extends SQLiteOpenHelper {
         super(context, TABLE_NAME, null, VERSION);
     }
 
+
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("create table " + TABLE_NAME + " ("
@@ -28,12 +29,15 @@ public class NoteDBOpenHelper extends SQLiteOpenHelper {
                 + TIME + " TEXT NOT NULL,"
                 + PRIORITY + " TEXT NOT NULL)");
 
-
     }
+
+
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-
+        sqLiteDatabase.execSQL("drop table if exists " + TABLE_NAME);
+        onCreate(sqLiteDatabase);
     }
+
 
 }

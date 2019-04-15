@@ -6,14 +6,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,7 +21,7 @@ import com.afollestad.materialdialogs.MaterialDialog;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xp.note.R;
-import com.xp.note.adapter.MyAdapter;
+import com.xp.note.adapter.ListAdapter;
 import com.xp.note.db.DBManager;
 import com.xp.note.model.Note;
 
@@ -40,12 +40,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton addBtn;
     private DBManager dm;
     private List<Note> noteDataList = new ArrayList<>();
-    private MyAdapter adapter;
-    private ListView listView;
+    private ListAdapter adapter;
+    private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView emptyListTextView;
     long waitTime = 2000;
     long touchTime = 0;
+    int version = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //第一：默认初始化
         Bmob.initialize(this, "bdc479c9f78d163df6442083ce8578e8");
 
-
     }
 
     //初始化
@@ -64,8 +64,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         dm.readFromDB(noteDataList);
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
 
-
-        listView = findViewById(R.id.list);
+        recyclerView = findViewById(R.id.list);
         addBtn = findViewById(R.id.add);
         emptyListTextView = findViewById(R.id.empty);
         addBtn.setOnClickListener(this);
@@ -74,10 +73,47 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         for (int i=noteDataList.size()-1;i>=0;i--){
             noteDataList2.add(noteDataList.get(i));
         }
-        adapter = new MyAdapter(this, noteDataList2);
-        listView.setAdapter(adapter);
-        listView.setOnItemClickListener(new NoteClickListener());
-        listView.setOnItemLongClickListener(new NoteLongClickListener());
+        adapter = new ListAdapter(noteDataList2);
+        recyclerView.setAdapter(adapter);
+
+        //设置布局管理器
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        adapter.setOnItemClickListener(new ListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                int noteId = adapter.getItem(position).getId();
+                Intent intent = new Intent(MainActivity.this, EditNoteActivity.class);
+                intent.putExtra("id", noteId);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
+                finish();
+            }
+
+            @Override
+            public void onItemLongClick(View view, final int position) {
+                final Note note = adapter.getItem(position);
+                final int id = note.getId();
+                new MaterialDialog.Builder(MainActivity.this)
+                        .content(R.string.are_you_sure)
+                        .positiveText(R.string.delete)
+                        .negativeText(R.string.cancel)
+                        .callback(new MaterialDialog.ButtonCallback() {
+                                      @Override
+                                      public void onPositive(MaterialDialog dialog) {
+                                          DBManager.getInstance(MainActivity.this).deleteNote(id);
+                                          adapter.removeItem(position);
+                                          //TODO bug
+                                          if (adapter.getItemCount() == 0){
+                                              updateView();
+                                          }
+
+                                      }
+                                  }
+                        ).show();
+
+            }
+        });
         setStatusBarColor();
         updateView();
 
@@ -88,24 +124,36 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onRefresh() {
                 BmobQuery<Note> query = new BmobQuery<>();
                 query.addWhereGreaterThanOrEqualTo("id",0);
-                query.findObjects(new FindListener<Note>() {
+                query.order("-id").findObjects(new FindListener<Note>() {
                     @Override
                     public void done(List<Note> list, BmobException e) {
                         if (e==null){
 
-                            //ToDO bug
-//                            noteDataList2.clear();
-//                            noteDataList2.addAll(list);
-//
+
                             swipeRefreshLayout.setRefreshing(false);
-//                            adapter = new MyAdapter(getApplicationContext(), noteDataList2);
-//                            listView.setAdapter(adapter);
-//                            adapter.notifyDataSetChanged();
+
+
+//                            for (int i = 0; i < noteDataList.size(); i++){
+//                                dm.deleteNote(noteDataList.get(i).getId());
+//                            }
+
+                            dm.deleteAllNote(version++);
+                            noteDataList.clear();
+                            noteDataList2.clear();
+
+                            for (int j = list.size() - 1; j >= 0; j--){
+                                Note position = list.get(j);
+                                dm.addToDB(position.getTitle(),position.getContent(),position.getTime(),position.getPriority());
+                            }
+
+                            adapter.updataView(list);
+                            Log.d("TAG",list.get(0).getTitle());
+
 
                             Toast.makeText(getApplicationContext(),"获取数据成功",Toast.LENGTH_SHORT).show();
                         }else {
                             swipeRefreshLayout.setRefreshing(false);
-                            Toast.makeText(getApplicationContext(),"获取数据失败"+e,Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getApplicationContext(),"您暂无笔记"+e,Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
@@ -117,10 +165,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     //空数据更新
     private void updateView() {
         if (noteDataList.isEmpty()) {
-            listView.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.GONE);
             emptyListTextView.setVisibility(View.VISIBLE);
         } else {
-            listView.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.VISIBLE);
             emptyListTextView.setVisibility(View.GONE);
         }
     }
@@ -152,47 +200,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    //listView单击事件
-    private class NoteClickListener implements AdapterView.OnItemClickListener {
-        @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-            MyAdapter.ViewHolder viewHolder = (MyAdapter.ViewHolder) view.getTag();
-            String noteId = viewHolder.tvId.getText().toString().trim();
-            Intent intent = new Intent(MainActivity.this, EditNoteActivity.class);
-            intent.putExtra("id", Integer.parseInt(noteId));
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        }
-    }
-
-    //listView长按事件
-    private class NoteLongClickListener implements AdapterView.OnItemLongClickListener {
-        @Override
-        public boolean onItemLongClick(final AdapterView<?> adapterView, View view, final int i, long l) {
-            final Note note = ((MyAdapter) adapterView.getAdapter()).getItem(i);
-            if (note == null) {
-                return true;
-            }
-            final int id = note.getId();
-            new MaterialDialog.Builder(MainActivity.this)
-                    .content(R.string.are_you_sure)
-                    .positiveText(R.string.delete)
-                    .negativeText(R.string.cancel)
-                    .callback(new MaterialDialog.ButtonCallback() {
-                                  @Override
-                                  public void onPositive(MaterialDialog dialog) {
-                                      DBManager.getInstance(MainActivity.this).deleteNote(id);
-                                      adapter.removeItem(i);
-                                      updateView();
-                                  }
-                              }
-                    ).show();
-
-            return true;
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -284,54 +291,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
 
 
-
-                //同步数据到bmob
-//                for (int i = 0;i < noteDataList.size();i++){
-//                    final Note note = new Note();
-//                    note.setId(noteDataList.get(i).getId());
-//                    note.setTitle(noteDataList.get(i).getTitle());
-//                    note.setContent(noteDataList.get(i).getContent());
-//
-//                    BmobQuery<Note> query = new BmobQuery<>();
-//                    query.addWhereEqualTo("id",noteDataList.get(i).getId());
-//
-//
-//
-//
-//                    query.findObjects(new FindListener<Note>() {
-//                        @Override
-//                        public void done(List<Note> list, BmobException e) {
-//                            if (e == null){
-//                                //查询到则更新数据
-//                                note.update(list.get(0).getObjectId(), new UpdateListener() {
-//                                    @Override
-//                                    public void done(BmobException e) {
-//                                        if (e == null){
-//                                           // Toast.makeText(getApplicationContext(),"同步数据成功1",Toast.LENGTH_SHORT).show();
-//                                        }else {
-//
-//                                        }
-//                                    }
-//                                });
-//
-//                            }else {
-//                                //查询失败则新建一条数据
-//                                note.save(new SaveListener<String>() {
-//                                    @Override
-//                                    public void done(String s, BmobException e) {
-//                                        if(e==null){
-//                                            Toast.makeText(getApplicationContext(),"同步数据成功",Toast.LENGTH_SHORT).show();
-//                                        }else{
-//                                            Log.i("bmob","失败："+e.getMessage()+","+e.getErrorCode());
-//                                        }
-//                                    }
-//                                });
-//
-//                            }
-//                        }
-//                    });
-//
-//                }
                 break;
             default:
                 break;
