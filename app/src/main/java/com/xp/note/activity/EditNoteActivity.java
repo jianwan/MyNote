@@ -65,7 +65,7 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edit_text);
+        setContentView(R.layout.activity_editnote);
         init();
         //初始化Mob的shareSDK（作用是分享到微信）
         initMob();

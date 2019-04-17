@@ -2,77 +2,75 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.xp.note">
 
-
-    <!--bmob -->
-    <!--允许联网 -->
+    <!-- bmob -->
+    <!-- 允许联网 -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--获取GSM（2g）、WCDMA（联通3g）等网络状态的信息  -->
+    <!-- 获取GSM（2g）、WCDMA（联通3g）等网络状态的信息 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--获取wifi网络状态的信息 -->
+    <!-- 获取wifi网络状态的信息 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <!--保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
+    <!-- 保持CPU 运转，屏幕和键盘灯有可能是关闭的,用于文件上传和下载 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!--获取sd卡写的权限，用于文件上传和下载-->
+    <!-- 获取sd卡写的权限，用于文件上传和下载 -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <!--允许读取手机状态 用于创建BmobInstallation-->
+    <!-- 允许读取手机状态 用于创建BmobInstallation -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-
-
     <uses-permission android:name="android.permission.GET_TASKS" />
-    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
-    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <!-- 蓝牙分享所需的权限 -->
-    <uses-permission  android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <!-- 震动权限 -->
     <uses-permission android:name="android.permission.VIBRATE" />
-
 
     <application
         android:name="com.mob.MobApplication"
         android:allowBackup="true"
         android:icon="@drawable/notes"
         android:label="@string/app_name"
-        android:theme="@style/Theme.NoteApp" >
-
+        android:theme="@style/Theme.NoteApp">
         <activity
-            android:name=".activity.MainActivity"
-            android:label="@string/app_name" >
+            android:name=".activity.SplashActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.EditNoteActivity"/>
+        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.EditNoteActivity" />
+        <activity android:name=".activity.LoginActivity"/>
+        <activity android:name=".activity.SignupActivity"/>
 
-
-        <activity android:name=".wxapi.WXEntryActivity"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+        <activity
+            android:name=".wxapi.WXEntryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:exported="true"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <activity
             android:name="com.mob.tools.MobUIShell"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:windowSoftInputMode="stateHidden|adjustResize"/>
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
 
-        <meta-data android:name="Mob-AppKey" android:value="29c963caf080a"/>
-        <meta-data android:name="Mob-AppSecret" android:value="168705997ca77485143e60171e908eb3"/>
-
-
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="29c963caf080a" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="168705997ca77485143e60171e908eb3" />
 
         <provider
             android:name="cn.bmob.v3.util.BmobContentProvider"
-            android:authorities="com.xp.note.BmobContentProvider">
-        </provider>
+            android:authorities="com.xp.note.BmobContentProvider"></provider>
+
 
     </application>
-
-
 
 </manifest>

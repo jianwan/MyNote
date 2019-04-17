@@ -129,9 +129,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void done(List<Note> list, BmobException e) {
                         if (e==null){
 
-
                             swipeRefreshLayout.setRefreshing(false);
-
 
 //                            for (int i = 0; i < noteDataList.size(); i++){
 //                                dm.deleteNote(noteDataList.get(i).getId());
@@ -149,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             adapter.updataView(list);
                             Log.d("TAG",list.get(0).getTitle());
 
+                            updateView();
 
                             Toast.makeText(getApplicationContext(),"获取数据成功",Toast.LENGTH_SHORT).show();
                         }else {
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //空数据更新
     private void updateView() {
-        if (noteDataList.isEmpty()) {
+        if (adapter.getItemCount() == 0) {
             recyclerView.setVisibility(View.GONE);
             emptyListTextView.setVisibility(View.VISIBLE);
         } else {

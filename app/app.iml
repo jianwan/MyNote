@@ -132,6 +132,7 @@
     <orderEntry type="library" name="Gradle: me.zhanghai.android.materialprogressbar:library-1.3.0" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProjects\Internet\Note\app\libs\MobTools-2018.1128.1916.jar:unspecified@jar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: com.android.support.test:rules-0.5" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-1.1.3" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-media-compat-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-annotations:26.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:support-v4-26.1.0" level="project" />
@@ -155,6 +156,7 @@
     <orderEntry type="library" name="Gradle: com.android.support:cardview-v7-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:design-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.12.0@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.android.support.constraint:constraint-layout-solver:1.1.3@jar" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProjects\Internet\Note\app\libs\MobCommons-2018.1128.1916.jar:unspecified@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.android.support:animated-vector-drawable-26.1.0" level="project" />
     <orderEntry type="library" name="Gradle: __local_aars__:E.\AndroidProjects\Internet\Note\app\libs\ShareSDK-Wechat-Favorite-3.4.0.jar:unspecified@jar" level="project" />

@@ -2,6 +2,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/action_my"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="我的数据"/>
+
+    <item
+        android:id="@+id/action_trash"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="回收站"/>
+
     <item
         android:id="@+id/action_clean"
         android:orderInCategory="100"

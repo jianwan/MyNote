@@ -14,4 +14,21 @@
     <string name="exit">press again to exit</string>
     <string name="empty">no notes yet</string>
     <string name="settingtime">setting time</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">欢迎使用MyNote记事本</string>
+
+    <string name="section_one">您可以使用它记笔记</string>
+    <string name="section_two">也可以提醒自己</string>
+    <string name="section_three">还可以分享到朋友圈</string>
+
+
+
+    <string name="onboarding_finish_button_description">Finish</string>
+    <string name="onboarding_next_button_description">Next</string>
+    <string name="onboarding_pre_button_description">Pre</string>
+
+    <string name="username">username</string>
+    <string name="password">password</string>
+
 </resources>
