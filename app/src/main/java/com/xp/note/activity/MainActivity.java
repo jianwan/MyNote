@@ -1,13 +1,21 @@
 package com.xp.note.activity;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -24,18 +32,27 @@ import com.xp.note.R;
 import com.xp.note.adapter.ListAdapter;
 import com.xp.note.db.DBManager;
 import com.xp.note.model.Note;
+import com.xp.note.model.Note_Deleted;
+import com.xp.note.receiver.ClockReceiver;
+import com.xp.note.utils.SharedPreferencesUtil;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
 import cn.bmob.v3.BmobQuery;
+import cn.bmob.v3.BmobUser;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+/*
+ *
+ *  Toolbar的使用：https://juejin.im/post/5a30de4051882531d828680d
+ */
+
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private FloatingActionButton addBtn;
     private DBManager dm;
@@ -44,25 +61,70 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private RecyclerView recyclerView;
     private SwipeRefreshLayout swipeRefreshLayout;
     private TextView emptyListTextView;
-    long waitTime = 2000;
-    long touchTime = 0;
-    int version = 2;
+
+    private long waitTime = 2000;
+    private long touchTime = 0;
+    private int version = 2;
+
+
+    private PendingIntent pendingIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         init();
+
         //第一：默认初始化
         Bmob.initialize(this, "bdc479c9f78d163df6442083ce8578e8");
 
+
+        //定时闹钟实现
+        List<Note> clockTimeList = new ArrayList<>();
+        dm = new DBManager(this);
+        dm.readFromDBByClockTime(clockTimeList);
+
+        AlarmManager[] alarmManager = new AlarmManager[clockTimeList.size()+1];
+        List<PendingIntent> intentArray = new ArrayList<>();
+        for(int i=0; i < clockTimeList.size(); i++){
+            Intent intent = new Intent(this, ClockReceiver.class);
+            intent.putExtra ("content", clockTimeList.get(i).getContent());
+            pendingIntent = PendingIntent.getBroadcast(this, i , intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            alarmManager[i] = (AlarmManager) getSystemService(ALARM_SERVICE);
+            alarmManager[i].set(AlarmManager.RTC_WAKEUP,clockTimeList.get(i).getClockTime() ,pendingIntent);
+
+            intentArray.add(pendingIntent);
+
+        }
+
+
     }
+
 
     //初始化
     private void init() {
+
         dm = new DBManager(this);
-        dm.readFromDB(noteDataList);
+        dm.readFromDBById(noteDataList);
+
+
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
 
         recyclerView = findViewById(R.id.list);
         addBtn = findViewById(R.id.add);
@@ -103,12 +165,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                       public void onPositive(MaterialDialog dialog) {
                                           DBManager.getInstance(MainActivity.this).deleteNote(id);
                                           adapter.removeItem(position);
-                                          //TODO bug
-                                          if (adapter.getItemCount() == 0){
-                                              updateView();
-                                          }
+                                          addNoteToDeleted(note.getTitle(),note.getContent(),note.getPriority(),note.getUser());
 
                                       }
+
+                                      private void addNoteToDeleted(String title, String content, String priority,String user) {
+                                          Note_Deleted note_deleted = new Note_Deleted();
+                                          note_deleted.setTitle(title);
+                                          note_deleted.setContent(content);
+                                          note_deleted.setPriority(priority);
+                                          note_deleted.setUser(user);
+                                          note_deleted.save(new SaveListener<String>() {
+                                              @Override
+                                              public void done(String s, BmobException e) {
+                                                  if(e==null){
+                                                     Toast.makeText(getBaseContext(),"删除成功",Toast.LENGTH_SHORT).show();
+                                                  }else{
+                                                      Toast.makeText(getBaseContext(),"删除失败" + e.getMessage(),Toast.LENGTH_SHORT).show();
+                                                  }
+                                              }
+                                          });
+                                      }
+
                                   }
                         ).show();
 
@@ -122,8 +200,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                SharedPreferencesUtil.init(getApplicationContext());
                 BmobQuery<Note> query = new BmobQuery<>();
                 query.addWhereGreaterThanOrEqualTo("id",0);
+                query.addWhereEqualTo("user",SharedPreferencesUtil.getUsername());
                 query.order("-id").findObjects(new FindListener<Note>() {
                     @Override
                     public void done(List<Note> list, BmobException e) {
@@ -131,17 +211,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                             swipeRefreshLayout.setRefreshing(false);
 
-//                            for (int i = 0; i < noteDataList.size(); i++){
-//                                dm.deleteNote(noteDataList.get(i).getId());
-//                            }
-
                             dm.deleteAllNote(version++);
                             noteDataList.clear();
                             noteDataList2.clear();
 
                             for (int j = list.size() - 1; j >= 0; j--){
                                 Note position = list.get(j);
-                                dm.addToDB(position.getTitle(),position.getContent(),position.getTime(),position.getPriority());
+                                dm.addToDB(position.getTitle(),position.getContent(),position.getTime(),position.getPriority(),position.getClockTime());
                             }
 
                             adapter.updataView(list);
@@ -200,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -212,7 +289,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_about:
                 MaterialDialog dialog = new MaterialDialog.Builder(this)
                         .title(R.string.about)
-                        .content("这是一个课程设计")
+                        .content("这是我的毕业设计")
                         .positiveText("确定")
                         .build();
 
@@ -240,7 +317,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //同步逻辑，先删除该用户的所有笔记，再将本地的笔记上传至服务器
 
                 BmobQuery<Note> queryObjectId = new BmobQuery<>();
-                queryObjectId.addWhereGreaterThan("id",-1);
+                SharedPreferencesUtil.init(getApplicationContext());
+                String username = SharedPreferencesUtil.getUsername();
+                queryObjectId.addWhereEqualTo("user" , username);
                 queryObjectId.findObjects(new FindListener<Note>() {
                     @Override
                     public void done(List<Note> list, BmobException e) {
@@ -253,7 +332,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     @Override
                                     public void done(BmobException e) {
                                         if (e == null){
-                                            Toast.makeText(getApplicationContext(),"表删除成功",Toast.LENGTH_SHORT).show();
+//                                            Toast.makeText(getApplicationContext(),"表删除成功",Toast.LENGTH_SHORT).show();
 
                                         }else {
 
@@ -266,11 +345,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //删除成功则添加新数据
                             for (int i = 0; i<noteDataList.size();i++){
                                 Note note = new Note();
+                                note.setUser(SharedPreferencesUtil.getUsername());
                                 note.setId(noteDataList.get(i).getId());
                                 note.setTitle(noteDataList.get(i).getTitle());
                                 note.setContent(noteDataList.get(i).getContent());
                                 note.setTime(noteDataList.get(i).getTime());
                                 note.setPriority(noteDataList.get(i).getPriority());
+                                note.setClockTime(noteDataList.get(i).getClockTime());
                                 note.save(new SaveListener<String>() {
                                     @Override
                                     public void done(String s, BmobException e) {
@@ -299,12 +380,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //按返回键时
     public void onBackPressed() {
-        long currentTime = System.currentTimeMillis();
-        if ((currentTime - touchTime) >= waitTime) {
-            Toast.makeText(this, R.string.exit, Toast.LENGTH_SHORT).show();
-            touchTime = currentTime;
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
         } else {
-            finish();
+            long currentTime = System.currentTimeMillis();
+            if ((currentTime - touchTime) >= waitTime) {
+                Toast.makeText(this, R.string.exit, Toast.LENGTH_SHORT).show();
+                touchTime = currentTime;
+            } else {
+                finish();
+            }
         }
     }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_manage) {
+            // Handle the camera action
+            Toast.makeText(this,"回收站",Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this,DeletedNoteActivity.class);
+            startActivity(intent);
+
+        }else if (id == R.id.login_out){
+            //退出登录逻辑
+            BmobUser.logOut();
+
+            SharedPreferencesUtil.init(this);
+            SharedPreferencesUtil.setUsername(null);
+            SharedPreferencesUtil.setPassword(null);
+            SharedPreferencesUtil.setIsLogin(false);
+            dm.deleteAllNote(version++);
+
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
 }

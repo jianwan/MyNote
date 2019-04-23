@@ -24,6 +24,7 @@
         android:alpha="0.12"
         android:background="@android:color/white" />
 
+    <!-- shape的学习：https://blog.csdn.net/Rflyee/article/details/20785495 -->
     <Button
         android:id="@+id/jump"
         android:layout_width="match_parent"
@@ -31,7 +32,7 @@
         android:layout_marginLeft="270dp"
         android:layout_marginRight="20dp"
         android:background="@drawable/shape"
-        android:text="还剩 5 s"
+        android:text="还剩 11 s"
         android:layout_gravity="bottom"
         android:layout_marginBottom="64dp"/>
 

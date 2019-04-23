@@ -143,7 +143,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     //登录失败
     public void onLoginFailed() {
-        Toast.makeText(getBaseContext(), "登录失败,请稍后重试", Toast.LENGTH_LONG).show();
+        Toast.makeText(getBaseContext(), "登录失败,请检查账号或密码是否错误再试", Toast.LENGTH_LONG).show();
         loginButton.setEnabled(true);
     }
 

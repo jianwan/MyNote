@@ -13,6 +13,7 @@ public class NoteDBOpenHelper extends SQLiteOpenHelper {
     public static final String CONTENT = "content";
     public static final String TIME = "time";
     public static final String PRIORITY = "priority";
+    public static final String CLOCKTIME = "clocKTime";
     public static final String ID = "_id";
 
     public NoteDBOpenHelper(Context context) {
@@ -27,6 +28,7 @@ public class NoteDBOpenHelper extends SQLiteOpenHelper {
                 + CONTENT + " TEXT NOT NULL,"
                 + TITLE + " TEXT NOT NULL,"
                 + TIME + " TEXT NOT NULL,"
+                + CLOCKTIME + " Long,"
                 + PRIORITY + " TEXT NOT NULL)");
 
     }

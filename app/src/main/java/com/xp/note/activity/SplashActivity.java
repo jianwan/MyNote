@@ -30,8 +30,9 @@ import com.xp.note.utils.SharedPreferencesUtil;
 import cn.bmob.v3.Bmob;
 
 /*
- * 启动页 一个activity + 一个fragment  具体查看xml
- * 参考文章：http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2017/0418/7843.html
+ *  启动页 一个activity + 一个fragment  具体样式查看activity_splash.xml + fragmet+splash.xml
+ *  参考文章：http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2017/0418/7843.html  (即fragment + viewpager)
+ *  Android倒计时实现(此处使用CountDownTimer)：https://juejin.im/post/58bead54ac502e006b2fe6e0
  */
 
 public class SplashActivity extends AppCompatActivity implements View.OnClickListener {
@@ -44,6 +45,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     private AppCompatButton finish;
     private ImageView[] indicators;
     private Button jump;
+    private CountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +57,6 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
         //第一：默认初始化
         Bmob.initialize(this, "bdc479c9f78d163df6442083ce8578e8");
-
 
 
         //初始化viewpager + adapter
@@ -89,7 +90,7 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
 
 
         //倒计时
-        CountDownTimer timer = new CountDownTimer(11000,1000) {
+        timer = new CountDownTimer(6000,1000) {
             @Override
             public void onTick(long millisUntilFinished) {
                 jump.setText("还剩 " + millisUntilFinished / 1000 + " s");
@@ -181,10 +182,10 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
     }
 
 
+
     private void intentToNext() {
-
+        timer.cancel();
         SharedPreferencesUtil.init(this);
-
         if (SharedPreferencesUtil.getIsLogin()){
             Intent intent = new Intent(SplashActivity.this, MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -196,9 +197,11 @@ public class SplashActivity extends AppCompatActivity implements View.OnClickLis
             startActivity(intent);
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }
-
     }
 
+
+
+    /* ------------------------------ 以下为fragment的代码 --------------------------------- */
 
     /**
      * A placeholder fragment containing a simple view.

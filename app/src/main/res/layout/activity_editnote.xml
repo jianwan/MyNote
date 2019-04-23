@@ -7,11 +7,30 @@
     android:orientation="horizontal">
 
 
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appbarlayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"/>
+    </android.support.design.widget.AppBarLayout>
+
+    <LinearLayout
+        android:id="@+id/linear1"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:layout_below="@id/appbarlayout"
+        android:orientation="horizontal"/>
+
     <LinearLayout
         android:id="@+id/linear_remind"
         android:layout_width="match_parent"
         android:layout_height="40dp"
-        android:layout_marginTop="10dp"
+        android:layout_below="@+id/linear1"
         android:gravity="center"
         android:orientation="horizontal">
 
@@ -24,7 +43,7 @@
             android:text="提醒时间"
             android:gravity="center"
             android:textColor="#ff000000"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
 
         <EditText
             android:id="@+id/editview_remindtime"

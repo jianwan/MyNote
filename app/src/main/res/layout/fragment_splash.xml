@@ -20,7 +20,8 @@
             android:adjustViewBounds="true"
             android:src="@drawable/ic_speaker_notes_black_48dp"
             android:alpha="0.30"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:layout_marginTop="?attr/actionBarSize"/>
 
     </FrameLayout>
 
@@ -31,6 +32,7 @@
         android:layout_gravity="bottom"
         android:gravity="center"
         android:orientation="vertical"
+        android:layout_marginTop="?attr/actionBarSize"
         android:padding="@dimen/activity_horizontal_margin">
         <android.support.v7.widget.AppCompatTextView
             android:layout_width="wrap_content"

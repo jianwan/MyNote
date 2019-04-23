@@ -3,25 +3,15 @@ package com.xp.note.model;
 import cn.bmob.v3.BmobObject;
 
 /**
- * Note 的 bean 类
+ * Note_Deleted 的 bean 类，同 note
  */
-public class Note extends BmobObject {
+public class Note_Deleted extends BmobObject {
 
-    private int id;
     private String title;
     private String content;
-    private String time;
     private String priority;
     private String user;
-    private Long clockTime;
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
 
     public String getTitle() {
         return title;
@@ -39,13 +29,6 @@ public class Note extends BmobObject {
         this.content = content;
     }
 
-    public String getTime() {
-        return time;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
 
     public String getPriority() {
         return priority;
@@ -63,12 +46,5 @@ public class Note extends BmobObject {
         this.user = user;
     }
 
-    public Long getClockTime() {
-        return clockTime;
-    }
-
-    public void setClockTime(Long clockTime) {
-        this.clockTime = clockTime;
-    }
 
 }

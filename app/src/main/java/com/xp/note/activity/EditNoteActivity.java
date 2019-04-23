@@ -1,20 +1,18 @@
 package com.xp.note.activity;
 
 import android.app.DatePickerDialog;
-import android.app.Service;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.Selection;
 import android.text.Spannable;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,10 +28,9 @@ import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xp.note.R;
 import com.xp.note.db.DBManager;
 import com.xp.note.model.Note;
+import com.xp.note.utils.TimeUtil;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import cn.sharesdk.framework.Platform;
@@ -43,7 +40,8 @@ import cn.sharesdk.wechat.friends.Wechat;
 import cn.sharesdk.wechat.moments.WechatMoments;
 
 /**
- * Created by XP on 2015/2/15.
+ * 笔记编辑页面
+ *
  */
 public class EditNoteActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -53,34 +51,30 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
     private int noteID = -1;
     private DBManager dbManager;
 
-    EditText settingTime;
-    String alarmClockTime;                    //闹铃时间
+    private EditText settingTime;
+    private String alarmClockTime;                    //闹铃时间
 
-    RadioGroup radioGroup;
-    RadioButton high,medium,low;              //优先级
-    RadioButton currentRadbtn;                //选中的优先级
+    private RadioGroup radioGroup;
+    private RadioButton high,medium,low;              //优先级
+    private RadioButton currentRadbtn;                //选中的优先级
 
-    Vibrator vibrator;   //手机震动
+    private Long clockTime;                           //闹钟时间（毫秒）
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editnote);
+
+
         init();
         //初始化Mob的shareSDK（作用是分享到微信）
         initMob();
 
-        vibrator=(Vibrator)getSystemService(Service.VIBRATOR_SERVICE);
-
     }
 
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        Toast.makeText(this, "触摸屏幕手机震动", Toast.LENGTH_LONG).show();
-        //震动手机两秒
-        vibrator.vibrate(2000);
-        return super.onTouchEvent(event);
-    }
+
+
 
     private void initMob() {
         //MobSDK.init(this);
@@ -105,6 +99,9 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
         saveBtn.setOnClickListener(this);
 
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         //name，defaultValue
         noteID = getIntent().getIntExtra("id", -1);
 
@@ -122,7 +119,6 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
         setStatusBarColor();
 
 
-
         //设置优先级
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -132,30 +128,31 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
             }
         });
 
-        //设置闹铃
-        String time = getTime();
-        settingTime.setText(time);
+        //设置闹铃时间
         settingTime.setFocusable(false);
         settingTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 final Calendar calendar = Calendar.getInstance();
-                DatePickerDialog dialog = new DatePickerDialog(EditNoteActivity.this, new DatePickerDialog.OnDateSetListener() {
+                final DatePickerDialog datePickerDialog = new DatePickerDialog(EditNoteActivity.this, new DatePickerDialog.OnDateSetListener() {
                     @Override
                     public void onDateSet(DatePicker view, final int year, final int month, final int dayOfMonth) {
                         TimePickerDialog timePickerDialog = new TimePickerDialog(EditNoteActivity.this, new TimePickerDialog.OnTimeSetListener() {
                             @Override
                             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                                alarmClockTime = year + "-" + month + "-" + dayOfMonth + " " + hourOfDay + ":" + minute;
+                                int m = month + 1;
+                                alarmClockTime = year + "-" + m + "-" + dayOfMonth + " " + hourOfDay + ":" + minute +" "+ TimeUtil.getCurrentWendday();
                                 settingTime.setText(alarmClockTime);
-
+                                clockTime = TimeUtil.transformateFromDateToMilis(year,month,dayOfMonth,hourOfDay,minute);
+                                Toast.makeText(getBaseContext(),""+ clockTime,Toast.LENGTH_SHORT).show();
                             }
+
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);
                         timePickerDialog.show();
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
-                dialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
-                dialog.show();
+                datePickerDialog.getDatePicker().setMinDate(calendar.getTimeInMillis());
+                datePickerDialog.show();
             }
         });
     }
@@ -178,6 +175,8 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
         Note note = dbManager.readData(id);
         titleEt.setText(note.getTitle());
         contentEt.setText(note.getContent());
+        settingTime.setText(TimeUtil.transformateFromMilisToDate(note.getClockTime()));
+        clockTime = note.getClockTime();
         String priority = note.getPriority();
         if (priority.equals("高")){
             high.setChecked(true);
@@ -191,29 +190,21 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
         Selection.setSelection(spannable, titleEt.getText().length());
     }
 
+
+
     @Override
     public void onClick(View view) {
         String title = titleEt.getText().toString();
         String content = contentEt.getText().toString();
-        String time = getTime();
+        String time = TimeUtil.getCurrentTime();
         String  priorityString = currentRadbtn.getText().toString();
-//        int priority = 3;
-//        if (priorityString.equals("高")){
-//            Log.d("TAG","高");
-//            priority = 1;
-//        }else if(priorityString.equals("中")){
-//            Log.d("TAG","中");
-//            priority = 2;
-//        }else if (priorityString.equals("低")){
-//            Log.d("TAG","低");
-//            priority = 3;
-//        }
+
         if (noteID == -1) {
             //默认添加
-            dbManager.addToDB(title, content, time,priorityString);
+            dbManager.addToDB(title, content, time,priorityString,clockTime);
         } else {
             //更新
-            dbManager.updateNote(noteID, title, content, time,priorityString);
+            dbManager.updateNote(noteID, title, content, time,priorityString,clockTime);
         }
         Intent i = new Intent(EditNoteActivity.this, MainActivity.class);
         startActivity(i);
@@ -221,13 +212,8 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
         this.finish();
     }
 
-    //得到时间
-    private String getTime() {
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm E");
-        Date curDate = new Date();
-        String str = format.format(curDate);
-        return str;
-    }
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
