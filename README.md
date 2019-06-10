@@ -2,7 +2,8 @@
 
 *更新于2019/06/11,已完成，暂时不再更新*
 
-### 一个`Material Design`风格的记事本(由 [bigggge](https://github.com/bigggge/Note) 而来)
+##
+### 一款`Material Design`风格的记事本(由 [bigggge](https://github.com/bigggge/Note) 而来)
 
 `APK` 在 `imgs` 文件夹下，可以自行下载。
 
@@ -34,4 +35,7 @@
 
 	* 分享到微信
 
+##  
+ 
+**欢迎大家`star`以及`fork`，有问题请联系我 `jianwan1221@qq.com`**.
 
