@@ -27,7 +27,8 @@
             android:layout_height="wrap_content"
             android:text="My Note"
             android:textSize="48dp"
-            android:gravity="center"/>
+            android:gravity="center"
+            android:textColor="@color/white"/>
 
         <!--  Email Label -->
         <android.support.design.widget.TextInputLayout
