@@ -32,6 +32,7 @@ import cn.bmob.v3.Bmob;
 /*
  *  启动页 一个activity + 一个fragment  具体样式查看activity_splash.xml + fragmet+splash.xml
  *  参考文章：http://www.jcodecraeer.com/a/anzhuokaifa/androidkaifa/2017/0418/7843.html  (即fragment + viewpager)
+ *  可参考开源库：https://github.com/HeinrichReimer/material-intro
  *  Android倒计时实现(此处使用CountDownTimer)：https://juejin.im/post/58bead54ac502e006b2fe6e0
  */
 

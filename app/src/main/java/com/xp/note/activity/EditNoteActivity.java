@@ -41,6 +41,8 @@ import cn.sharesdk.wechat.moments.WechatMoments;
 
 /**
  * 笔记编辑页面
+ * RadioButton + Checkbox :  https://blog.csdn.net/coder_pig/article/details/47035625
+ * DateTimePicker (时间选择器): https://github.com/wdullaer/MaterialDateTimePicker
  *
  */
 public class EditNoteActivity extends AppCompatActivity implements View.OnClickListener {
@@ -124,7 +126,7 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 currentRadbtn = findViewById(i);
-                Toast.makeText(getApplicationContext(), "按钮组值发生改变,你选了" + currentRadbtn.getText()+currentRadbtn.getId(), Toast.LENGTH_LONG).show();
+//                Toast.makeText(getApplicationContext(), "按钮组值发生改变,你选了" + currentRadbtn.getText()+currentRadbtn.getId(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -144,7 +146,7 @@ public class EditNoteActivity extends AppCompatActivity implements View.OnClickL
                                 alarmClockTime = year + "-" + m + "-" + dayOfMonth + " " + hourOfDay + ":" + minute +" "+ TimeUtil.getCurrentWendday();
                                 settingTime.setText(alarmClockTime);
                                 clockTime = TimeUtil.transformateFromDateToMilis(year,month,dayOfMonth,hourOfDay,minute);
-                                Toast.makeText(getBaseContext(),""+ clockTime,Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(getBaseContext(),""+ clockTime,Toast.LENGTH_SHORT).show();
                             }
 
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false);

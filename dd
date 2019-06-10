@@ -1,0 +1,150 @@
+[33mcommit 360a2db2b900621197b0f2f6b2aef99132020543[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Tue Apr 23 22:36:17 2019 +0800
+
+    finish
+
+[33mcommit 374b698c338c53eb957a19ff415765782182da02[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Thu Apr 18 01:59:13 2019 +0800
+
+    完成引导页和登录注册
+
+[33mcommit f3da8fddb1ce060e09830ca129cae0ab9d06d743[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Mon Apr 15 17:17:14 2019 +0800
+
+    完成刷新 和 Sqlite部分
+
+[33mcommit dda3e3f1ff5485a573d5b37864c5a99c9a0ee904[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Sun Apr 14 23:04:32 2019 +0800
+
+    2019/04/14
+
+[33mcommit 9d1fd707f7bf9f093cc4aaa8c1ceb492b826327f[m[33m ([m[1;31mgithub/master[m[33m)[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Thu Jan 17 15:27:23 2019 +0800
+
+    test
+
+[33mcommit e33aae795ce92e7bb5d441d8c48b12e6ede57385[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Wed Jan 16 18:27:17 2019 +0800
+
+    text commit
+
+[33mcommit da3da1bc6d1999e1a66f6baf60972ea4deaba30c[m
+Author: jianwan <jianwan1221@qq.com>
+Date:   Wed Jan 16 18:21:38 2019 +0800
+
+    share
+
+[33mcommit 2b72896796b9ec08f8eee8981cc4e820e4510191[m
+Author: bigggge <bigggge@users.noreply.github.com>
+Date:   Thu May 25 07:39:46 2017 +0800
+
+    Update README.md
+
+[33mcommit f790e5435947830a96fa0ac6c5949af903bab0d9[m
+Author: bigggge <545511611@qq.com>
+Date:   Sun Apr 12 11:07:43 2015 +0800
+
+    10th bug fix
+
+[33mcommit 1537f6d18f0583c182ff8eaada59493c4bf64461[m
+Author: bigggge <545511611@qq.com>
+Date:   Sun Apr 12 11:00:11 2015 +0800
+
+    10th bug fix
+
+[33mcommit 0e1955fa92f730f9aae8b3315f88a0eed234c476[m
+Merge: 46ebafd 2cdfde8
+Author: bigggge <545511611@qq.com>
+Date:   Sun Apr 5 23:03:40 2015 +0800
+
+    Merge remote-tracking branch 'origin/master'
+
+[33mcommit 46ebafd8179c9b4d6390c134596c74d3c2799dbb[m
+Author: bigggge <545511611@qq.com>
+Date:   Sun Apr 5 23:03:00 2015 +0800
+
+    9th bug fix
+
+[33mcommit 2cdfde8014fedbbb8a89714738b469f0ba90f83b[m
+Author: bigggge <bigggge@users.noreply.github.com>
+Date:   Sat Mar 28 10:57:14 2015 +0800
+
+    Update README.md
+
+[33mcommit 8094b8b9c23a0bdf4b3b8b074ace25878c3014a6[m
+Author: bigggge <bigggge@users.noreply.github.com>
+Date:   Sat Mar 28 10:56:34 2015 +0800
+
+    Update README.md
+
+[33mcommit 8d6a4061f08c46a21aa8ee8d5aa8362a1b5037c4[m
+Author: bigggge <bigggge@users.noreply.github.com>
+Date:   Sat Mar 28 10:54:35 2015 +0800
+
+    Update README.md
+
+[33mcommit 17392286cd0d4c0cb46bb4137ebf17891595a028[m
+Author: bigggge <bigggge@users.noreply.github.com>
+Date:   Sat Mar 28 10:37:59 2015 +0800
+
+    Create README.md
+
+[33mcommit 17608c7bfcabb2be6e82fddaf35b537cb8402bc2[m
+Author: bigggge <545511611@qq.com>
+Date:   Sat Mar 28 10:35:44 2015 +0800
+
+    8th Add Screenshot
+
+[33mcommit 1037fceb3c54e26a41dc7c9ce9ee656b388739cb[m
+Author: bigggge <545511611@qq.com>
+Date:   Sat Mar 28 10:19:36 2015 +0800
+
+    7th Add 国际化和一体化状态栏
+
+[33mcommit f6a363da7f480566cc3d7649cfdfd16f6a14b8b0[m
+Author: bigggge <545511611@qq.com>
+Date:   Tue Mar 3 15:41:52 2015 +0800
+
+    sixth commit
+
+[33mcommit 7440c7ecedf1e66506f17b81ea5f5b12f4555b68[m
+Author: bigggge <545511611@qq.com>
+Date:   Sat Feb 28 08:44:00 2015 +0800
+
+    fifth commit
+
+[33mcommit 82d20e176b654158428228a877ea3d9b4d6d6c0f[m
+Author: bigggge <545511611@qq.com>
+Date:   Mon Feb 16 19:08:46 2015 +0800
+
+    fourth commit
+
+[33mcommit 03c505449da0d8841ba3b714d5d15617b4112833[m
+Author: bigggge <545511611@qq.com>
+Date:   Mon Feb 16 14:37:01 2015 +0800
+
+    third commit
+
+[33mcommit 29246d69e9ad5466119937b270492705242026bc[m
+Author: bigggge <545511611@qq.com>
+Date:   Mon Feb 16 14:34:16 2015 +0800
+
+    second commit
+
+[33mcommit f9bf789f25efdcd3200b805027729a77f550ef0e[m
+Author: bigggge <545511611@qq.com>
+Date:   Mon Feb 16 14:33:06 2015 +0800
+
+    second commit
+
+[33mcommit ed6ca5578af73dda5b25a37ae01bcced95011e43[m
+Author: bigggge <545511611@qq.com>
+Date:   Mon Feb 16 10:02:08 2015 +0800
+
+    first commit

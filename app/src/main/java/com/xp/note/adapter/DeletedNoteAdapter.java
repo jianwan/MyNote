@@ -25,7 +25,7 @@ public class DeletedNoteAdapter extends RecyclerView.Adapter<DeletedNoteAdapter.
     @Override
     public DeletedNoteAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         MyViewHolder holder = new MyViewHolder(LayoutInflater.from(parent.getContext()).
-                inflate(R.layout.notes_item, parent, false));
+                inflate(R.layout.deleted_notes_item, parent, false));
         return holder;
     }
 
@@ -35,6 +35,7 @@ public class DeletedNoteAdapter extends RecyclerView.Adapter<DeletedNoteAdapter.
         holder.title.setText(notes.get(position).getTitle());
         holder.content.setText(notes.get(position).getContent());
         holder.priority.setText("优先级："+ notes.get(position).getPriority());
+        holder.updatedAt.setText(notes.get(position).getUpdatedAt());
 
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -47,17 +48,6 @@ public class DeletedNoteAdapter extends RecyclerView.Adapter<DeletedNoteAdapter.
             }
         });
 
-        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if(onItemClickListener != null) {
-                    int pos = holder.getLayoutPosition();
-                    onItemClickListener.onItemLongClick(holder.itemView, pos);
-                }
-                //表示此事件已经消费，不会触发单击事件
-                return true;
-            }
-        });
     }
 
 
@@ -110,13 +100,15 @@ public class DeletedNoteAdapter extends RecyclerView.Adapter<DeletedNoteAdapter.
         private TextView title;
         private TextView content;
         private TextView priority;
+        private TextView updatedAt;
 
         public MyViewHolder(View view)
         {
             super(view);
-            title = view.findViewById(R.id.note_title);
-            content = view.findViewById(R.id.note_content);
-            priority = view.findViewById(R.id.note_priority);
+            title = view.findViewById(R.id.deleted_note_title);
+            content = view.findViewById(R.id.deleted_note_content);
+            priority = view.findViewById(R.id.deleted_note_priority);
+            updatedAt = view.findViewById(R.id.deleted_note_time);
         }
     }
 

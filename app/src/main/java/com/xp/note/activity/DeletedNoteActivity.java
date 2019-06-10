@@ -8,25 +8,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.afollestad.materialdialogs.MaterialDialog;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xp.note.R;
 import com.xp.note.adapter.DeletedNoteAdapter;
+import com.xp.note.model.Note;
 import com.xp.note.model.Note_Deleted;
 import com.xp.note.utils.SharedPreferencesUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
+import cn.bmob.v3.listener.SaveListener;
+import cn.bmob.v3.listener.UpdateListener;
+
 
 public class DeletedNoteActivity extends AppCompatActivity {
 
@@ -47,7 +52,6 @@ public class DeletedNoteActivity extends AppCompatActivity {
 
     private void initViews() {
 
-
         Toolbar toolbar = findViewById(R.id.deleted_toolbar);
         setSupportActionBar(toolbar);
 
@@ -56,22 +60,6 @@ public class DeletedNoteActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.deleted_list);
        //设置布局管理器
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-
-        adapter = new DeletedNoteAdapter(deletedNotelist);
-        recyclerView.setAdapter(adapter);
-
-
-        adapter.setOnItemClickListener(new DeletedNoteAdapter.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                Toast.makeText(getApplicationContext(),""+position,Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onItemLongClick(View view, int position) {
-
-            }
-        });
 
 
         setStatusBarColor();
@@ -90,11 +78,59 @@ public class DeletedNoteActivity extends AppCompatActivity {
             @Override
             public void done(List<Note_Deleted> list, BmobException e) {
                 if (e == null){
+                    Collections.reverse(list);
                     deletedNotelist.addAll(list);
-                    Log.d("TAG deleted",list.size()+"");
-                    Log.d("TAG deleted notelist",deletedNotelist.size()+"");
+                    adapter = new DeletedNoteAdapter(deletedNotelist);
+                    recyclerView.setAdapter(adapter);
+                    updateView();
+
+                    adapter.setOnItemClickListener(new DeletedNoteAdapter.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(View view, final int position) {
+                            new MaterialDialog.Builder(DeletedNoteActivity.this)
+                                    .content("确定恢复该笔记吗？")
+                                    .positiveText("确定")
+                                    .negativeText("取消")
+                                    .callback(new MaterialDialog.ButtonCallback() {
+                                        @Override
+                                        public void onPositive(MaterialDialog dialog) {
+                                            String objectId  = deletedNotelist.get(position).getObjectId();
+                                            Note_Deleted deleted = new Note_Deleted();
+                                            deleted.delete(objectId, new UpdateListener() {
+                                                @Override
+                                                public void done(BmobException e) {
+                                                    if(e==null){
+                                                        Note note = new Note();
+                                                        note.setUser(deletedNotelist.get(position).getUser());
+                                                        note.setTitle(deletedNotelist.get(position).getTitle());
+                                                        note.setContent(deletedNotelist.get(position).getContent());
+                                                        note.setPriority(deletedNotelist.get(position).getPriority());
+                                                        note.setClockTime(0L);
+                                                        note.save(new SaveListener<String>() {
+                                                            @Override
+                                                            public void done(String s, BmobException e) {
+                                                                adapter.removeItem(position);
+                                                                Toast.makeText(getBaseContext(),"笔记恢复成功",Toast.LENGTH_SHORT).show();
+                                                            }
+                                                        });
+                                                    }else{
+
+                                                    }
+                                                }
+                                            });
+
+                                        }
+                                    }).show();
+
+                        }
+
+                        @Override
+                        public void onItemLongClick(View view, int position) {
+
+                        }
+                    });
                 }else {
-                    Toast.makeText(getApplicationContext(),"您暂无删除的笔记"+e,Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),"您暂无删除的笔记"+e,Toast.LENGTH_SHORT).show();
                 }
             }
         });

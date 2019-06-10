@@ -130,7 +130,6 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 //        String code = codeText.getText().toString();
         final String password = passwordText.getText().toString();
 
-        // TODO: Implement your own signup logic here.
         User user = new User();
         user.setUsername(email);
         user.setPassword(password);
@@ -157,27 +156,17 @@ public class SignupActivity extends AppCompatActivity implements View.OnClickLis
 //                    SharedPreferencesUtil.setPassword(password);
                     progressDialog.dismiss();
                     Toast.makeText(SignupActivity.this, "注册成功，请到" + email + "邮箱中进行激活账户完成注册最后一步" +
-                            "(如未收到邮件请把jianwan1221@qq.com加入白名单再验证邮箱)", Toast.LENGTH_LONG).show();
+                            "(如未收到邮件请把1002648595@qq.com加入白名单再验证邮箱)", Toast.LENGTH_LONG).show();
 
                 } else {
                     progressDialog.dismiss();
                     onSignupFailed();
-                    Toast.makeText(getBaseContext(), "注册失败：" + e.getMessage() + "请稍后重试", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getBaseContext(), "注册失败," + "请稍后重试", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
 
-//        new android.os.Handler().postDelayed(
-//                new Runnable() {
-//                    public void run() {
-//                        // On complete call either onSignupSuccess or onSignupFailed
-//                        // depending on success
-//                        onSignupSuccess();
-//                        // onSignupFailed();
-//                        progressDialog.dismiss();
-//                    }
-//                }, 3000);
 
 
     }

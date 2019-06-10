@@ -1,5 +1,6 @@
 package com.xp.note.adapter;
 
+import android.content.Context;
 import android.os.CountDownTimer;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,10 +19,12 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
 
     private List<Note> notes;
     private CountDownTimer timer;
+    private Context context;
 
     private ListAdapter.OnItemClickListener onItemClickListener;
 
-    public ListAdapter(List<Note> notes) {
+    public ListAdapter(Context context,List<Note> notes) {
+        this.context = context;
         this.notes = notes;
     }
 
@@ -34,6 +37,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
+
         // 绑定数据
         holder.id.setText(notes.get(position).getId() + "");
         holder.title.setText(notes.get(position).getTitle());
@@ -41,22 +45,25 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
         holder.time.setText("编辑于"+notes.get(position).getTime());
         holder.priority.setText("优先级："+ notes.get(position).getPriority());
 
-        Long currentMilisTime = TimeUtil.getCurrentMilisTime();
-        if (notes.get(position).getClockTime() <= currentMilisTime){
-            holder.remaintime.setText("任务已过期");
-        }else {
-            timer = new CountDownTimer(notes.get(position).getClockTime(),1000) {
-                @Override
-                public void onTick(long millisUntilFinished) {
-                    holder.remaintime.setText(TimeUtil.transformateFromMilisToStringDate(TimeUtil.getCurrentMilisTime(),
-                            notes.get(position).getClockTime()));
-                }
+        if (notes.size() != 0){
+            Long currentMilisTime = TimeUtil.getCurrentMilisTime();
+            if (notes.get(position).getClockTime() <= currentMilisTime){
+                holder.remaintime.setText("任务已过期");
+            }else {
+                timer = new CountDownTimer(notes.get(position).getClockTime(),1000) {
+                    @Override
+                    public void onTick(long millisUntilFinished) {
+                        holder.remaintime.setText(TimeUtil.transformateFromMilisToStringDate(TimeUtil.getCurrentMilisTime(),
+                                notes.get(position).getClockTime()));
+                    }
 
-                @Override
-                public void onFinish() {
-                    holder.remaintime.setText("任务已过期");
-                }
-            }.start();
+                    @Override
+                    public void onFinish() {
+                        timer.cancel();
+                        holder.remaintime.setText("任务已过期");
+                    }
+                }.start();
+            }
         }
 
 
@@ -81,6 +88,7 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
                 return true;
             }
         });
+
     }
 
 
@@ -106,13 +114,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
         if(notes == null) {
             notes = new ArrayList<>();
         }
-        notes.clear();
-        notes.addAll(newNotes);
+        this.notes = newNotes;
         notifyDataSetChanged();
     }
 
 
     public void removeAllItem() {
+
+        timer.cancel();
         notes.clear();
         notifyDataSetChanged();
     }
@@ -123,7 +132,9 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.MyViewHolder> 
             return;
         }
         notes.remove(position);
+        timer.cancel();
         notifyItemRemoved(position);
+//        notifyDataSetChanged();
     }
 
 

@@ -80,7 +80,7 @@ public class DBManager {
     //  读取数据(按照clockTime顺序)
     public void readFromDBByClockTime(List<Note> noteList) {
         String currentMilisTime  = TimeUtil.getCurrentMilisTime().toString();
-        Cursor cursor = dbReader.query(NoteDBOpenHelper.TABLE_NAME, null, "clocKTime > ?",
+        Cursor cursor = dbReader.query(NoteDBOpenHelper.TABLE_NAME, null, "clocKTime >= ?",
                 new String[]{currentMilisTime}, null, null, "clocKTime");
         try {
             if (cursor.moveToFirst()){

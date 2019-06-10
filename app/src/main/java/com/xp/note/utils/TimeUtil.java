@@ -40,6 +40,7 @@ public class TimeUtil {
 
     //转化毫秒到特定格式的时间
     public static String transformateFromMilisToStringDate(Long currerntTime, Long clockTime){
+
         Long mss = clockTime - currerntTime;
 
         long days = mss / (1000 * 60 * 60 * 24);
@@ -80,7 +81,12 @@ public class TimeUtil {
 
         Log.d("TAG",remainTime);
 
-        return remainTime;
+        if (mss > 0){
+            return remainTime;
+        }else {
+            return "任务已结束";
+        }
+
     }
 
 

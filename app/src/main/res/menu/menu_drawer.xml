@@ -8,7 +8,7 @@
         <item
             android:id="@+id/nav_manage"
             android:icon="@drawable/ic_menu_manage"
-            android:title="回收钻" />
+            android:title="回收站" />
 
         <item
             android:id="@+id/login_out"

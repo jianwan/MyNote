@@ -24,6 +24,7 @@ import cn.bmob.v3.listener.LogInListener;
  * 技术要点：TextInputLayout
  * 参考文章：(1) https://blog.csdn.net/u012792686/article/details/73089227
             (2) https://yifeng.studio/2016/11/28/android-textinputlayout/
+ * 参考demo： https://github.com/avjinder/Minimal-Todo
  * 关于material design的官方文档：https://material.io/design/components/text-fields.html#usage
  */
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener{
@@ -89,9 +90,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         final String email = emailText.getText().toString();
         final String password = passwordText.getText().toString();
 
-        // TODO: Implement your own authentication logic here.
-
-
+        //登录逻辑
         BmobUser.loginByAccount(email, password, new LogInListener<User>() {
             @Override
             public void done(User user, BmobException e) {
@@ -103,7 +102,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }else {
                     progressDialog.dismiss();
                     onLoginFailed();
-                    Toast.makeText(getBaseContext(),"",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),"登录失败，请检查账号密码是否错误后再试",Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -50,5 +50,7 @@ dependencies {
     implementation 'cn.bmob.android:http-legacy:1.0'
     implementation 'com.android.support:support-v4:23.2.1'
 
+    implementation 'com.lxj:xpopup:1.5.2'
+
 
 }

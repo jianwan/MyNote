@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -37,6 +38,7 @@ import com.xp.note.receiver.ClockReceiver;
 import com.xp.note.utils.SharedPreferencesUtil;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
@@ -49,7 +51,13 @@ import cn.bmob.v3.listener.UpdateListener;
 
 /*
  *
- *  Toolbar的使用：https://juejin.im/post/5a30de4051882531d828680d
+ *  Toolbar的使用：(1) https://juejin.im/post/5a30de4051882531d828680d
+ *                (2) https://blog.csdn.net/MonaLisaTearr/article/details/78415585
+ *
+ *  AlarmManager(闹钟)的使用：(1) https://blog.csdn.net/coder_pig/article/details/49423531
+ *                           (2) https://blog.csdn.net/wei_chong_chong/article/details/51258336
+ *                           (3) https://blog.csdn.net/fan7983377/article/details/51993793
+ *  github demo 参考：https://github.com/jsbintask22/memo
  */
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
@@ -69,11 +77,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private PendingIntent pendingIntent;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        if (Build.VERSION.SDK_INT >= 23) {
+            if (!Settings.canDrawOverlays(this)) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivityForResult(intent, 1);
+            } else {
+                //TODO do something you need
+            }
+        }
 
         init();
 
@@ -89,7 +108,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AlarmManager[] alarmManager = new AlarmManager[clockTimeList.size()+1];
         List<PendingIntent> intentArray = new ArrayList<>();
         for(int i=0; i < clockTimeList.size(); i++){
-            Intent intent = new Intent(this, ClockReceiver.class);
+            Intent intent = new Intent(MainActivity.this, ClockReceiver.class);
             intent.putExtra ("content", clockTimeList.get(i).getContent());
             pendingIntent = PendingIntent.getBroadcast(this, i , intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -113,16 +132,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         swipeRefreshLayout = findViewById(R.id.swiperefresh);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
 
@@ -130,12 +149,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addBtn = findViewById(R.id.add);
         emptyListTextView = findViewById(R.id.empty);
         addBtn.setOnClickListener(this);
+
         //反向展现数据 新建的note在最上面
-        final List<Note> noteDataList2 = new ArrayList<>();
-        for (int i=noteDataList.size()-1;i>=0;i--){
-            noteDataList2.add(noteDataList.get(i));
-        }
-        adapter = new ListAdapter(noteDataList2);
+        Collections.reverse(noteDataList);
+        adapter = new ListAdapter(this,noteDataList);
         recyclerView.setAdapter(adapter);
 
         //设置布局管理器
@@ -165,8 +182,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                       public void onPositive(MaterialDialog dialog) {
                                           DBManager.getInstance(MainActivity.this).deleteNote(id);
                                           adapter.removeItem(position);
-                                          addNoteToDeleted(note.getTitle(),note.getContent(),note.getPriority(),note.getUser());
-
+                                          addNoteToDeleted(note.getTitle(),note.getContent(),note.getPriority(),SharedPreferencesUtil.getUsername());
                                       }
 
                                       private void addNoteToDeleted(String title, String content, String priority,String user) {
@@ -212,20 +228,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             swipeRefreshLayout.setRefreshing(false);
 
                             dm.deleteAllNote(version++);
-                            noteDataList.clear();
-                            noteDataList2.clear();
+                            Collections.reverse(list);
+                            noteDataList = list;
 
-                            for (int j = list.size() - 1; j >= 0; j--){
-                                Note position = list.get(j);
+                            for (int i = 0; i < list.size(); i++){
+                                Note position = list.get(i);
                                 dm.addToDB(position.getTitle(),position.getContent(),position.getTime(),position.getPriority(),position.getClockTime());
+
                             }
 
+                            List<Note> showlist = new ArrayList();
+//                            dm.readFromDBByClockTime(showlist);
                             adapter.updataView(list);
-                            Log.d("TAG",list.get(0).getTitle());
 
                             updateView();
 
-                            Toast.makeText(getApplicationContext(),"获取数据成功",Toast.LENGTH_SHORT).show();
+                            if (list.size() == 0 ){
+                                Toast.makeText(getApplicationContext(),"你暂时还没有笔记",Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(getApplicationContext(),"获取数据成功",Toast.LENGTH_SHORT).show();
+                            }
+
                         }else {
                             swipeRefreshLayout.setRefreshing(false);
                             Toast.makeText(getApplicationContext(),"您暂无笔记"+e,Toast.LENGTH_SHORT).show();
@@ -303,10 +326,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         .callback(new MaterialDialog.ButtonCallback() {
                             @Override
                             public void onPositive(MaterialDialog dialog) {
-                                for (int id = 0; id < 100; id++)
-                                    DBManager.getInstance(MainActivity.this).deleteNote(id);
-                                adapter.removeAllItem();
-                                updateView();
+
+                                dm.deleteAllNote(version++);
+
+//                                noteDataList.clear();
+//                                adapter.updataView(noteDataList);
+
+                                recyclerView.setVisibility(View.GONE);
+                                emptyListTextView.setVisibility(View.VISIBLE);
                             }
                         }).show();
 
@@ -315,7 +342,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.action_sync:
 
                 //同步逻辑，先删除该用户的所有笔记，再将本地的笔记上传至服务器
-
                 BmobQuery<Note> queryObjectId = new BmobQuery<>();
                 SharedPreferencesUtil.init(getApplicationContext());
                 String username = SharedPreferencesUtil.getUsername();
@@ -426,5 +452,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
 }
