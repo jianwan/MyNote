@@ -3,7 +3,7 @@
 *更新于2019/06/11,已完成，暂时不再更新*
 
 ##
-### 一款`Material Design`风格的记事本(由 [bigggge](https://github.com/bigggge/Note) 而来)
+### 一款`Material Design`风格的`Android`记事本(由 [bigggge](https://github.com/bigggge/Note) 而来)
 
 `APK` 在 `imgs` 文件夹下，可以自行下载。
 
@@ -21,9 +21,9 @@
 * 登录注册；
 
 * 主页面
-	* 下拉刷新，从`Bmob`获取数据；
+	* 下拉刷新，从`Bmob`获取数据（将先清除本地数据）；
 
-	* 更新，将本地数据更新到远程`Bmob`后台（将清除本地数据）；
+	* 更新，将本地数据更新到远程`Bmob`后台；
 
 	* 清除本地所有数据；
 
